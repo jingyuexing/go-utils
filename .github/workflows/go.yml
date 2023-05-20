@@ -25,4 +25,4 @@ jobs:
         go-version: ${{ matrix.go-version }}
 
     - name: Testing utils
-      run: go test -v ./utils
+      run: go test -v -race ./...

@@ -7,7 +7,7 @@ import (
 )
 
 func TeTestCompose(t *testing.T) {
-	if utils.Compose(12, utils.IsNotZero, utils.IsNonNegative) {
+	if !utils.Compose(12, utils.IsNotZero, utils.IsNonNegative) {
 		t.Error("NOT PASS")
 	}
 }

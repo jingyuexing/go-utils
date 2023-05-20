@@ -32,7 +32,7 @@ func TestgetPathValue(t *testing.T) {
 		t.Error("Not Pass")
 	}
 	result2 := utils.GetPathValue("/user/{id}", "/user/456")
-	if result2["id"] == "456" {
+	if result2["id"] != "456" {
 		t.Error("NOT PASS")
 	}
 }

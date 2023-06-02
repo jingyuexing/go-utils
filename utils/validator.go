@@ -32,7 +32,7 @@ func Enum(val any, enums []any) bool {
 	return false
 }
 
-func Compose[T any](target T, validators ...(func(T) bool)) bool {
+func ValidateCompose[T any](target T, validators ...(func(T) bool)) bool {
 	for _, v := range validators {
 		if !v(target) {
 			return false

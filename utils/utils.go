@@ -184,3 +184,16 @@ func TimeDuration(duration string) (time.Time, error) {
     }
     return time.Now().Add(time.Duration(durationSecond) * time.Second).UTC(), nil
 }
+
+func Chunk(slice []int, size int) [][]int {
+    var chunks [][]int
+    for i := 0; i < len(slice); i += size {
+        end := i + size
+        if end > len(slice) {
+            end = len(slice)
+        }
+        chunks = append(chunks, slice[i:end])
+    }
+    return chunks
+}
+

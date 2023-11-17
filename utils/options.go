@@ -77,9 +77,6 @@ type People struct {
 }
 
 func main(){
-    var age *int = nil;
-    ok := Option(age)
-    vals := *ok.Expect("this is nil pointer")
     somePeople := Option(&People{
         Age: 20,
         Name: "Gog",

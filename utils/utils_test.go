@@ -8,7 +8,7 @@ import (
 )
 
 func TestFormat(t *testing.T) {
-	result := utils.Template("{a} {b}", map[string]string{
+	result := utils.Template("{a} {b}", map[string]any{
 		"a": "hello",
 		"b": "world",
 	})

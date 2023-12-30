@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	utils "jingyuexing.com/utils"
+	utils "jingyuexing.com/jingyuexing/go-utils"
 )
 
 func TestFormat(t *testing.T) {

@@ -1,3 +1,3 @@
-module jingyuexing.com
+module jingyuexing.com/jingyuexing/go-utils
 
 go 1.19

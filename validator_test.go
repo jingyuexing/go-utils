@@ -3,7 +3,7 @@ package utils_test
 import (
 	"testing"
 
-	utils "jingyuexing.com/utils"
+	utils "github.com/jingyuexing/go-utils"
 )
 
 func TestCompose(t *testing.T) {

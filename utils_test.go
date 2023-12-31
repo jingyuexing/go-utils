@@ -100,3 +100,35 @@ func TestReduce(t *testing.T) {
         t.Error("not pass")
     }
 }
+
+func TestOption(t *testing.T) {
+    type S struct {}
+    v := &S{}
+    v = nil
+    raw := utils.Some(v)
+
+    if !raw.IsNone() {
+        t.Error("not pass")
+    }
+    if raw.UnwrapOr(12).(int) != 12 {
+        t.Error("not pass")
+    }
+
+}
+
+func TestEmit(t *testing.T){
+    event := utils.NewEventEmit()
+    count := 1
+    event.On("plus",func(args ...any) {
+        count+= (args[0]).(int)
+    })
+
+    for i := 1; i <= 3; i++ {
+        event.Emit("plus",i)
+    }
+
+    if count != 7 {
+        t.Error("not pass")
+    }
+
+}

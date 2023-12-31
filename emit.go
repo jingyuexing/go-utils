@@ -40,7 +40,7 @@ func (e *EventEmit) On(name string, callback func(args ...any)) {
     defer e.mutex.Unlock()
 }
 
-func (e *EventEmit) AddEvent(name string, args ...any) {
+func (e *EventEmit) Emit(name string, args ...any) {
     e.mutex.Lock()
     for _, call := range e.events[name] {
         call(args...)

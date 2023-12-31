@@ -1,5 +1,7 @@
 package utils
 
+import "reflect"
+
 type Options[T any] struct {
     values T
     none   bool
@@ -16,7 +18,7 @@ type OptionInterface[T any] interface {
 }
 
 func Some[T any](value T) Options[T] {
-    return Options[T]{values: value, none: false}
+    return Options[T]{values: value, none: reflect.ValueOf(value).IsZero()}
 }
 
 func None[T any]() Options[T] {
@@ -45,7 +47,7 @@ func (o Options[T]) Expect(msg string) T {
     return o.values
 }
 
-func (o Options[T]) UnwrapOr(defaultValue T) T {
+func (o Options[T]) UnwrapOr(defaultValue any) any {
     if o.none {
         return defaultValue
     }
@@ -69,18 +71,4 @@ func Option[T any](value T) Options[T] {
     }else{
         return Some[T](value)
     }
-}
-type People struct {
-    Age int
-    Name string
-    Address string
-}
-
-func main(){
-    somePeople := Option(&People{
-        Age: 20,
-        Name: "Gog",
-        Address: "Mars",
-    })
-    somePeople.Unwrap()
 }

@@ -51,3 +51,52 @@ func TestMap2Struct(t *testing.T) {
 		t.Error("Not Pass")
 	}
 }
+
+func TestToggle(t *testing.T) {
+    toggle1 := utils.UseToggle("on","off")
+    toggle1.Switch()
+    if toggle1.Value() != "off" {
+        t.Error("not pass")
+    }
+    if toggle1.Switch() != "on" {
+        t.Error("not pass")
+    }
+
+    toggle2 := utils.UseToggle(true,false)
+    if toggle2.Value() != true {
+        t.Error("not pass")
+    }
+
+    if toggle2.Switch() != false {
+        t.Error("not pass")
+    }
+
+    toggle3 := utils.UseToggle(1,2,3,4,5,6,7,8,9)
+    if toggle3.Value() != 1 {
+        t.Error("not pass")
+    }
+    toggle3.Switch()
+    toggle3.Switch()
+    toggle3.Switch()
+    toggle3.Switch()
+    if toggle3.Value() != 5 {
+        t.Error("not pass")
+    }
+
+}
+
+
+func TestTimes(t *testing.T) {
+     utils.Times(func(t ...string) string {
+        return "hello world"
+     },2)
+}
+
+func TestReduce(t *testing.T) {
+    sum := utils.Reduce([]int{1,2,3,5,6},func(accumulator, currentValue int) int {
+        return accumulator + currentValue
+    },0)
+    if sum != 17 {
+        t.Error("not pass")
+    }
+}

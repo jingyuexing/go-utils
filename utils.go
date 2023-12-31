@@ -170,18 +170,6 @@ func Map2Struct(source map[string]any, bindingTarget any) {
 	}
 }
 
-func Compose[T any](funcs ...func(args ...T) T) func(args ...T) T {
-	callback := func(a func(args ...T) T, b func(args ...T) T) func(args ...T) T {
-		return func(args ...T) T {
-			return a(b(args...))
-		}
-	}
-	startFunc := funcs[0]
-	for i := 1; i < len(funcs); i++ {
-		startFunc = callback(startFunc, funcs[i])
-	}
-	return startFunc
-}
 
 func TimeDuration(duration string) (time.Time, error) {
 	const (
@@ -213,16 +201,4 @@ func TimeDuration(duration string) (time.Time, error) {
 		}
 	}
 	return time.Now().Add(time.Duration(durationSecond) * time.Second).UTC(), nil
-}
-
-func Chunk(slice []int, size int) [][]int {
-	var chunks [][]int
-	for i := 0; i < len(slice); i += size {
-		end := i + size
-		if end > len(slice) {
-			end = len(slice)
-		}
-		chunks = append(chunks, slice[i:end])
-	}
-	return chunks
 }

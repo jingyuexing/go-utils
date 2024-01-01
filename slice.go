@@ -88,3 +88,9 @@ func GroupBy[T any, K comparable](slice []T, getKey func(T) K) map[K][]T {
 
     return groups
 }
+
+func ForEach[T any](slice []T,callback func(value T,key int)){
+    for k, v := range slice {
+        callback(v,k)
+    }
+}

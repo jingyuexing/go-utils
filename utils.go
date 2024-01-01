@@ -75,17 +75,43 @@ func pathParse(target string) []string {
 	return obj
 }
 
-func AccessNested(data map[string]interface{}, path string, delimiter string) interface{} {
+func AccessNested(data any, path string, delimiter string) any {
 	keys := strings.Split(path, delimiter)
-	value := data
+	value := reflect.ValueOf(data)
+
+	if value.Kind() == reflect.Pointer {
+		value = reflect.Indirect(value)
+	}
+
 	for _, key := range keys {
-		if val, ok := value[key]; ok {
-			value = val.(map[string]interface{})
-		} else {
+		if !value.IsValid() {
+			return nil
+		}
+
+		switch value.Kind() {
+		case reflect.Pointer:
+			value = reflect.Indirect(value)
+		case reflect.Map:
+			mapValue := value.MapIndex(reflect.ValueOf(key))
+			if !mapValue.IsValid() {
+				return nil
+			}
+			value = mapValue
+		case reflect.Struct:
+			field := value.FieldByName(key)
+			if !field.IsValid() {
+				return nil
+			}
+			value = field
+		default:
 			return nil
 		}
 	}
-	return value
+
+	if value.IsValid() && value.CanInterface() {
+		return value.Interface()
+	}
+	return nil
 }
 
 func GetPathValue(raw string, realPath string) map[string]string {
@@ -169,7 +195,6 @@ func Map2Struct(source map[string]any, bindingTarget any) {
 		}
 	}
 }
-
 
 func TimeDuration(duration string) (time.Time, error) {
 	const (

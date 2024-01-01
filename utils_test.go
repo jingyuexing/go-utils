@@ -132,3 +132,20 @@ func TestEmit(t *testing.T){
     }
 
 }
+
+func TestAccessNested(t *testing.T) {
+    type S struct {
+        A struct {
+            B int
+        }
+    }
+    k := &S{
+        A: struct{B int}{
+            B:33,
+        },
+    }
+    value := utils.AccessNested(k,"A.B",".")
+    if value.(int) != 33 {
+        t.Error("not pass")
+    }
+}

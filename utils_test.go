@@ -23,7 +23,7 @@ func TestFormat(t *testing.T) {
         "b":2,
     },"?")
     if result2 != "1 2" {
-        t.Error("not pass")
+        t.Error(fmt.Sprintf("Expect %s, but got %s","1 2",result2))
     }
 
     result3 := utils.Template("/a /b",map[string]any{
@@ -32,7 +32,7 @@ func TestFormat(t *testing.T) {
     },"/")
 
     if result3 != "hello world" {
-        t.Error("not pass")
+        t.Error(fmt.Sprintf("Expect %s, but got %s","hello world",result3))
     }
 
     result4 := utils.Template("【a】 【b】",map[string]any{
@@ -41,7 +41,7 @@ func TestFormat(t *testing.T) {
     },"【】")
 
     if result4 != "hello world" {
-        t.Error("not pass")
+        t.Error(fmt.Sprintf("Expect %s, but got %s","hello world",result4))
     }
 
     result5 := utils.Template("《a》 《b》",map[string]any{
@@ -50,7 +50,7 @@ func TestFormat(t *testing.T) {
     },"《》")
 
     if result5 != "hello world" {
-        t.Error("not pass")
+        t.Error(fmt.Sprintf("Expect %s, but got %s","hello world",result5))
     }
 
     result6 := utils.Template("！a！ ！b！",map[string]any{
@@ -59,7 +59,7 @@ func TestFormat(t *testing.T) {
     },"！！")
 
     if result6 != "hello world" {
-        t.Error("not pass")
+        t.Error(fmt.Sprintf("Expect %s, but got %s","hello world",result6))
     }
 
     result7 := utils.Template("👉a👈 👉b👈",map[string]any{
@@ -68,7 +68,7 @@ func TestFormat(t *testing.T) {
     },"👉👈")
 
     if result7 != "hello world" {
-        t.Error("not pass")
+        t.Error(fmt.Sprintf("Expect %s, but got %s","hello world",result7))
     }
 
     result8 := utils.Template("[a] [b]",map[string]any{
@@ -77,7 +77,7 @@ func TestFormat(t *testing.T) {
     },"[]")
 
     if result8 != "hello world" {
-        t.Error("not pass")
+        t.Error(fmt.Sprintf("Expect %s, but got %s","hello world",result8))
     }
 }
 

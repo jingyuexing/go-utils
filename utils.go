@@ -16,6 +16,8 @@ func ToString(val any) string {
 	switch v := val.(type) {
 	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
 		valstr = fmt.Sprintf("%d", v)
+	case float32, float64:
+		valstr = fmt.Sprintf("%f", v)
 	case bool:
 		valstr = fmt.Sprintf("%v", v)
 	case string:
@@ -26,8 +28,11 @@ func ToString(val any) string {
 	return valstr
 }
 
-func Template(source string, data map[string]any) string {
-	tempSyntax := "{}"
+func Template(source string, data map[string]any, placeholder string) string {
+    tempSyntax := "{}"
+	if placeholder != ""{
+        tempSyntax = placeholder
+    }
 	key := ""
 	sourceCopy := &source
 	for k, val := range data {
@@ -36,10 +41,30 @@ func Template(source string, data map[string]any) string {
 		switch tempSyntax {
 		case "{}":
 			key = strings.Join([]string{"{", k, "}"}, "")
+        case "[]":
+            key = strings.Join([]string{"[", k, "]"}, "")
+        case "()":
+            key = strings.Join([]string{"(", k, ")"}, "")
 		case ":":
-			key = strings.Join([]string{":", k}, "")
+			key = strings.Join([]string{tempSyntax, k}, "")
+        case "@":
+            key = strings.Join([]string{tempSyntax, k}, "")
+        case "#":
+            key = strings.Join([]string{tempSyntax, k}, "")
 		case "$":
-			key = strings.Join([]string{"$", k}, "")
+			key = strings.Join([]string{tempSyntax, k}, "")
+		case "?":
+			key = tempSyntax
+        default:
+            if (len(tempSyntax) & 1) == 1 {
+                key = strings.Join([]string{tempSyntax, k}, "")
+                break
+            }
+            if (len(tempSyntax) & 1) == 0 {
+                halfLength := len(tempSyntax) / 2
+                key = strings.Join([]string{tempSyntax[:halfLength],k,tempSyntax[halfLength:]},"")
+            }
+
 		}
 		*sourceCopy = strings.Replace(*sourceCopy, key, valStr, 1)
 	}

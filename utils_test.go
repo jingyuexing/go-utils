@@ -11,12 +11,74 @@ func TestFormat(t *testing.T) {
 	result := utils.Template("{a} {b}", map[string]any{
 		"a": "hello",
 		"b": "world",
-	})
+	},"")
 	if result != "hello world" {
 		t.Error("not expected result", result)
 	} else {
 		fmt.Printf(result + "\n")
 	}
+
+    result2 := utils.Template("? ?",map[string]any{
+        "a":1,
+        "b":2,
+    },"?")
+    if result2 != "1 2" {
+        t.Error("not pass")
+    }
+
+    result3 := utils.Template("/a /b",map[string]any{
+        "a":"hello",
+        "b":"world",
+    },"/")
+
+    if result3 != "hello world" {
+        t.Error("not pass")
+    }
+
+    result4 := utils.Template("【a】 【b】",map[string]any{
+        "a":"hello",
+        "b":"world",
+    },"【】")
+
+    if result4 != "hello world" {
+        t.Error("not pass")
+    }
+
+    result5 := utils.Template("《a》 《b》",map[string]any{
+        "a":"hello",
+        "b":"world",
+    },"《》")
+
+    if result5 != "hello world" {
+        t.Error("not pass")
+    }
+
+    result6 := utils.Template("！a！ ！b！",map[string]any{
+        "a":"hello",
+        "b":"world",
+    },"！！")
+
+    if result6 != "hello world" {
+        t.Error("not pass")
+    }
+
+    result7 := utils.Template("👉a👈 👉b👈",map[string]any{
+        "a":"hello",
+        "b":"world",
+    },"👉👈")
+
+    if result7 != "hello world" {
+        t.Error("not pass")
+    }
+
+    result8 := utils.Template("[a] [b]",map[string]any{
+        "a":"hello",
+        "b":"world",
+    },"[]")
+
+    if result8 != "hello world" {
+        t.Error("not pass")
+    }
 }
 
 func TestCookieParse(t *testing.T) {

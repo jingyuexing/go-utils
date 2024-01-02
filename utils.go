@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -29,10 +30,10 @@ func ToString(val any) string {
 }
 
 func Template(source string, data map[string]any, placeholder string) string {
-    tempSyntax := "{}"
-	if placeholder != ""{
-        tempSyntax = placeholder
-    }
+	tempSyntax := "{}"
+	if placeholder != "" {
+		tempSyntax = placeholder
+	}
 	key := ""
 	sourceCopy := &source
 	for k, val := range data {
@@ -41,29 +42,29 @@ func Template(source string, data map[string]any, placeholder string) string {
 		switch tempSyntax {
 		case "{}":
 			key = strings.Join([]string{"{", k, "}"}, "")
-        case "[]":
-            key = strings.Join([]string{"[", k, "]"}, "")
-        case "()":
-            key = strings.Join([]string{"(", k, ")"}, "")
+		case "[]":
+			key = strings.Join([]string{"[", k, "]"}, "")
+		case "()":
+			key = strings.Join([]string{"(", k, ")"}, "")
 		case ":":
 			key = strings.Join([]string{tempSyntax, k}, "")
-        case "@":
-            key = strings.Join([]string{tempSyntax, k}, "")
-        case "#":
-            key = strings.Join([]string{tempSyntax, k}, "")
+		case "@":
+			key = strings.Join([]string{tempSyntax, k}, "")
+		case "#":
+			key = strings.Join([]string{tempSyntax, k}, "")
 		case "$":
 			key = strings.Join([]string{tempSyntax, k}, "")
 		case "?":
 			key = tempSyntax
-        default:
-            if (len(tempSyntax) & 1) == 1 {
-                key = strings.Join([]string{tempSyntax, k}, "")
-                break
-            }
-            if (len(tempSyntax) & 1) == 0 {
-                halfLength := len(tempSyntax) / 2
-                key = strings.Join([]string{tempSyntax[:halfLength],k,tempSyntax[halfLength:]},"")
-            }
+		default:
+			if (len(tempSyntax) & 1) == 1 {
+				key = strings.Join([]string{tempSyntax, k}, "")
+				break
+			}
+			if (len(tempSyntax) & 1) == 0 {
+				halfLength := len(tempSyntax) / 2
+				key = strings.Join([]string{tempSyntax[:halfLength], k, tempSyntax[halfLength:]}, "")
+			}
 
 		}
 		*sourceCopy = strings.Replace(*sourceCopy, key, valStr, 1)
@@ -98,6 +99,31 @@ func pathParse(target string) []string {
 		}
 	}
 	return obj
+}
+
+func CreateNestedObject(keys string, value interface{}, delimiter string) map[string]interface{} {
+	if delimiter == "" {
+		delimiter = "."
+	}
+	keyList := strings.Split(keys, delimiter)
+	result := make(map[string]interface{})
+	current := reflect.ValueOf(result)
+
+	for i, key := range keyList {
+		if i == len(keyList)-1 {
+			current.SetMapIndex(reflect.ValueOf(key), reflect.ValueOf(value).Elem())
+		} else {
+			if current.MapIndex(reflect.ValueOf(key)).IsValid() {
+				current = current.MapIndex(reflect.ValueOf(key))
+			} else {
+				newMap := make(map[string]interface{})
+				current.SetMapIndex(reflect.ValueOf(key), reflect.ValueOf(newMap))
+				current = reflect.ValueOf(newMap)
+			}
+		}
+	}
+
+	return result
 }
 
 func AccessNested(data any, path string, delimiter string) any {
@@ -136,6 +162,64 @@ func AccessNested(data any, path string, delimiter string) any {
 	if value.IsValid() && value.CanInterface() {
 		return value.Interface()
 	}
+	return nil
+}
+
+func NestedObject[T any](target T, path string, cb func(target reflect.Value, key string)) error {
+	keys := strings.Split(path, ".")
+	v := reflect.ValueOf(target)
+
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+
+	for _, key := range keys {
+		switch v.Kind() {
+		case reflect.Map:
+			mapValue := v.MapIndex(reflect.ValueOf(key))
+
+			if mapValue.Kind() == reflect.Interface ||
+                mapValue.Kind() == reflect.Pointer {
+				mapValue = mapValue.Elem()
+			}
+			if mapValue.IsValid() {
+				cb(mapValue, key)
+				if mapValue.Kind() == reflect.Map || mapValue.Kind() == reflect.Pointer {
+					v = mapValue
+				}
+			} else {
+				return errors.New("unreachable access path")
+			}
+		case reflect.Struct:
+			field := v.FieldByName(key)
+			if field.Kind() == reflect.Pointer ||
+				field.Kind() == reflect.Interface ||
+				field.Kind() == reflect.Map {
+				field = field.Elem()
+			}
+			if field.IsValid() {
+				v = field
+				cb(v, key)
+			} else {
+				return errors.New("unreachable access path")
+			}
+		case reflect.Interface:
+			if v.Elem().Kind() == reflect.Map || v.Elem().Kind() == reflect.Pointer {
+				v = v.Elem()
+			} else {
+				return errors.New("unreachable access path")
+			}
+		case reflect.Pointer:
+			if v.Elem().IsValid() {
+				v = v.Elem()
+			} else {
+				return errors.New("unreachable access path")
+			}
+		default:
+			return errors.New("invalid target type")
+		}
+	}
+
 	return nil
 }
 

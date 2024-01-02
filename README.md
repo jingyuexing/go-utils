@@ -20,7 +20,7 @@ func GetPathValue(raw string, realPath string) map[string]string
 ```go
 func (c *Cookie) NewCookie(cookie string, delimiter string, joiner string) *Cookie
 ```
-- This can parse the Cookie string or parse the Query string, you can specify separators and connectors for parsing [see test case](utils_test.go#L22)
+- This can parse the Cookie string or parse the Query string, you can specify separators and connectors for parsing [see test case](utils_test.go#L84-L89)
 
 
 ```go

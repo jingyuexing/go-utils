@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+	"time"
 
 	utils "github.com/jingyuexing/go-utils"
 )
@@ -88,6 +89,11 @@ func TestCookieParse(t *testing.T) {
 	cookie.PutOne("s", "v")
 	fmt.Printf("%s\n", cookie.ToString())
 }
+
+func TestDebounce(t *testing.T){
+
+}
+
 
 func TestgetPathValue(t *testing.T) {
 	result := utils.GetPathValue("/user/:id", "/user/12")
@@ -262,4 +268,24 @@ func TestNestedAttr(t *testing.T) {
 	if finalValue2.(string) != "Haaaa" {
 		t.Error(fmt.Sprintf("Expect: %s, but got %s", "Haaaa", finalValue2.(string)))
 	}
+}
+
+
+func TestDateTimeFormat(t *testing.T){
+    datetime := time.Unix(1706572292,0)
+    year := utils.DateTimeFormat(datetime,"YYYY")
+    if year != "2024" {
+        t.Error("format year is wrong")
+    }
+
+    result1 := utils.DateTimeFormat(datetime,"YY/MM/dd")
+    if result1 != "24/01/30" {
+        t.Error("format date wrong")
+    }
+
+    result2 := utils.DateTimeFormat(datetime,"MM/dd/YYYY HH:mm:ss.ms")
+
+    if result2 != "01/30/2024 07:51:32.00"{
+        t.Error("format datetime wrong")
+    }
 }

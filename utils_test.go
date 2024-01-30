@@ -283,9 +283,14 @@ func TestDateTimeFormat(t *testing.T){
         t.Error("format date wrong")
     }
 
-    result2 := utils.DateTimeFormat(datetime,"MM/dd/YYYY HH:mm:ss.ms")
+    result2 := utils.DateTimeFormat(datetime,"MM/dd/YYYY HH:mm:ss")
 
-    if result2 != "01/30/2024 07:51:32.00"{
+    if result2 != "01/30/2024 07:51:32"{
         t.Error("format datetime wrong")
+    }
+
+    result3 := utils.DateTimeFormat(datetime,"YYYY年M月d日 H时m分s秒")
+    if result3 != "2024年1月30日 7时51分32秒"{
+        t.Error("format has wrong")
     }
 }

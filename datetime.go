@@ -13,10 +13,13 @@ const (
 	FormatMonth       FormatTemplate = "MM"
 	FormatShortMonth  FormatTemplate = "M"
 	FormatDay         FormatTemplate = "dd"
+	FormatShortDay    FormatTemplate = "d"
 	FormatHour        FormatTemplate = "HH"
 	FormatShortHour   FormatTemplate = "H"
 	FormatSecond      FormatTemplate = "ss"
+	FormatShortSecond FormatTemplate = "s"
 	FormatMinute      FormatTemplate = "mm"
+	FormatShortMinute FormatTemplate = "m"
 	FormatMillisecond FormatTemplate = "ms"
 	FormatWeek        FormatTemplate = "W"
 	FormatShortWeek   FormatTemplate = "WW"
@@ -30,16 +33,19 @@ func DateTimeFormat(date time.Time, format string) string {
 		FormatMonth:       int(date.Month()),
 		FormatShortMonth:  int(date.Month()),
 		FormatDay:         date.Day(),
+		FormatShortDay:    date.Day(),
 		FormatHour:        date.Hour(),
 		FormatShortHour:   date.Hour() % 12,
 		FormatSecond:      date.Second(),
+		FormatShortSecond: date.Second(),
 		FormatMinute:      date.Minute(),
+		FormatShortMinute: date.Minute(),
 		FormatMillisecond: date.Nanosecond() / int(time.Millisecond),
 		FormatWeek:        int(date.Weekday()),
 		FormatShortWeek:   int(date.Weekday()),
 	}
 
-	for _, key := range []FormatTemplate{FormatYear, FormatMonth, FormatShortYear, FormatShortMonth, FormatDay, FormatHour, FormatShortHour, FormatSecond, FormatMinute, FormatMillisecond, FormatWeek, FormatShortWeek} {
+	for _, key := range []FormatTemplate{FormatYear, FormatMonth, FormatShortYear, FormatShortMonth, FormatDay, FormatShortDay, FormatHour, FormatShortHour, FormatSecond, FormatShortSecond, FormatMinute, FormatShortMinute, FormatMillisecond, FormatWeek, FormatShortWeek} {
 		formatted = strings.Replace(
 			formatted,
 			string(key),

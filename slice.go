@@ -67,6 +67,9 @@ func PadStart[T any](slice []T, targetLength int, padValue T) []T {
     if paddingLength <= 0 {
         return slice
     }
+    if currentLength > targetLength {
+        return slice
+    }
 
     newSlice := make([]T, 0, paddingLength)
     for i := 0; i < paddingLength; i++ {

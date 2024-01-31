@@ -278,18 +278,18 @@ func TestDateTimeFormat(t *testing.T) {
 
 	result1 := utils.DateTimeFormat(datetime, "YY/MM/dd")
 	if result1 != "24/01/30" {
-		t.Error("format date wrong")
+		t.Error(fmt.Sprintf("Expect: %s, but got %s","24/01/30",result1))
 	}
 
 	result2 := utils.DateTimeFormat(datetime, "MM/dd/YYYY HH:mm:ss")
 
 	if result2 != "01/30/2024 07:51:32" {
-		t.Error("format datetime wrong")
+		t.Error(fmt.Sprintf("Expect: %s, but got %s","01/30/2024 07:51:32",result2))
 	}
 
 	result3 := utils.DateTimeFormat(datetime, "YYYY年M月d日 H时m分s秒")
 	if result3 != "2024年1月30日 7时51分32秒" {
-		t.Error("format has wrong")
+		t.Error(fmt.Sprintf("Expect: %s, but got %s","2024年1月30日 7时51分32秒",result3))
 	}
 }
 
@@ -316,11 +316,11 @@ func TestDateTime(t *testing.T) {
 
 
     if datetime.String() != "2024-01-30T07:51:32.5132Z" {
-		t.Error("format time has wrong")
+		t.Error(fmt.Sprintf("Expect: %s, but got %s","2024-01-30T07:51:32.5132Z",datetime.String()))
 	}
 
     if datetime.Add(100,"D").String() != "2024-05-09T07:51:32.5132Z" {
-        t.Error("add 100 days has wrong")
+        t.Error(fmt.Sprintf("Expect: %s, but got %s","2024-01-30T07:51:32.5132Z",datetime.Add(100,"D").String()))
     }
 
     if datetime.CurrentYearDays() != 366 {

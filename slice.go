@@ -49,7 +49,7 @@ func Filter[T any](slice []T, predicate func(T) bool) []T {
 func PadEnd[T any](slice []T, targetLength int, padValue T) []T {
     currentLength := len(slice)
     paddingLength := targetLength - currentLength
-    if paddingLength <= 0 {
+    if paddingLength <= 0 || currentLength > targetLength {
         return slice
     }
     newSlice := make([]T, 0,paddingLength)
@@ -64,10 +64,7 @@ func PadEnd[T any](slice []T, targetLength int, padValue T) []T {
 func PadStart[T any](slice []T, targetLength int, padValue T) []T {
     currentLength := len(slice)
     paddingLength := targetLength - currentLength
-    if paddingLength <= 0 {
-        return slice
-    }
-    if currentLength > targetLength {
+    if paddingLength <= 0 || currentLength > targetLength {
         return slice
     }
 

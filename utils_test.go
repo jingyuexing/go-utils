@@ -90,10 +90,9 @@ func TestCookieParse(t *testing.T) {
 	fmt.Printf("%s\n", cookie.ToString())
 }
 
-func TestDebounce(t *testing.T){
+func TestDebounce(t *testing.T) {
 
 }
-
 
 func TestgetPathValue(t *testing.T) {
 	result := utils.GetPathValue("/user/:id", "/user/12")
@@ -270,27 +269,62 @@ func TestNestedAttr(t *testing.T) {
 	}
 }
 
+func TestDateTimeFormat(t *testing.T) {
+	datetime := time.Unix(1706572292, 0)
+	year := utils.DateTimeFormat(datetime, "YYYY")
+	if year != "2024" {
+		t.Error("format year is wrong")
+	}
 
-func TestDateTimeFormat(t *testing.T){
-    datetime := time.Unix(1706572292,0)
-    year := utils.DateTimeFormat(datetime,"YYYY")
-    if year != "2024" {
-        t.Error("format year is wrong")
+	result1 := utils.DateTimeFormat(datetime, "YY/MM/dd")
+	if result1 != "24/01/30" {
+		t.Error("format date wrong")
+	}
+
+	result2 := utils.DateTimeFormat(datetime, "MM/dd/YYYY HH:mm:ss")
+
+	if result2 != "01/30/2024 07:51:32" {
+		t.Error("format datetime wrong")
+	}
+
+	result3 := utils.DateTimeFormat(datetime, "YYYY年M月d日 H时m分s秒")
+	if result3 != "2024年1月30日 7时51分32秒" {
+		t.Error("format has wrong")
+	}
+}
+
+func TestDateTime(t *testing.T) {
+	datetime := utils.NewDateTime()
+	datetime = datetime.SetTime(1706572292,0)
+
+    if datetime.Day != 30 {
+        t.Error("the field Day is wrong")
     }
 
-    result1 := utils.DateTimeFormat(datetime,"YY/MM/dd")
-    if result1 != "24/01/30" {
-        t.Error("format date wrong")
+    if datetime.Year != 2024 {
+        t.Error("the field Day is wrong")
     }
 
-    result2 := utils.DateTimeFormat(datetime,"MM/dd/YYYY HH:mm:ss")
-
-    if result2 != "01/30/2024 07:51:32"{
-        t.Error("format datetime wrong")
+    if datetime.Add(2,"year").Year != 2026 {
+        t.Error("the add 2 year has wrong")
     }
 
-    result3 := utils.DateTimeFormat(datetime,"YYYY年M月d日 H时m分s秒")
-    if result3 != "2024年1月30日 7时51分32秒"{
-        t.Error("format has wrong")
+    if datetime.Add(1,"week").Day != 6 {
+        t.Error("the add 1 week has wrong")
     }
+    fmt.Println(datetime.String())
+
+
+    if datetime.String() != "2024-01-30T07:51:32.5132Z" {
+		t.Error("format time has wrong")
+	}
+
+    if datetime.Add(100,"D").String() != "2024-05-09T07:51:32.5132Z" {
+        t.Error("add 100 days has wrong")
+    }
+
+    if datetime.CurrentYearDays() != 366 {
+        t.Error("caculate has wrong")
+    }
+
 }

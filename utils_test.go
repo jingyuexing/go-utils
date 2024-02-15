@@ -278,7 +278,7 @@ func TestDateTimeFormat(t *testing.T) {
 
 	result1 := utils.DateTimeFormat(datetime, "YY/MM")
 	if result1 != "24/01" {
-		t.Error(fmt.Sprintf("Expect: %s, but got %s","24/01",result1))
+		t.Error(fmt.Sprintf("Expect: %s, but got %s", "24/01", result1))
 	}
 
 	// result2 := utils.DateTimeFormat(datetime, "MM/dd/YYYY HH:mm:ss")
@@ -295,36 +295,83 @@ func TestDateTimeFormat(t *testing.T) {
 
 func TestDateTime(t *testing.T) {
 	datetime := utils.NewDateTime()
-	datetime = datetime.SetTime(1706572292,0)
+	datetime = datetime.SetTime(1706572292, 0)
 
-    // if datetime.Day != 30 {
-    //     t.Error("the field Day is wrong")
-    // }
+	// if datetime.Day != 30 {
+	//     t.Error("the field Day is wrong")
+	// }
 
-    if datetime.Year != 2024 {
-        t.Error("the field Day is wrong")
-    }
+	if datetime.Year != 2024 {
+		t.Error("the field Day is wrong")
+	}
 
-    if datetime.Add(2,"year").Year != 2026 {
-        t.Error("the add 2 year has wrong")
-    }
+	if datetime.Add(2, "year").Year != 2026 {
+		t.Error("the add 2 year has wrong")
+	}
 
-    // if datetime.Add(1,"week").Day != 6 {
-    //     t.Error("the add 1 week has wrong")
-    // }
-    fmt.Println(fmt.Sprintf("Localed time is %s",datetime.String()))
+	// if datetime.Add(1,"week").Day != 6 {
+	//     t.Error("the add 1 week has wrong")
+	// }
+	fmt.Println(fmt.Sprintf("Localed time is %s", datetime.String()))
 
-
-    // if datetime.String() != "2024-01-30T07:51:32.5132Z" {
+	// if datetime.String() != "2024-01-30T07:51:32.5132Z" {
 	// 	t.Error(fmt.Sprintf("Expect: %s, but got %s","2024-01-30T07:51:32.5132Z",datetime.String()))
 	// }
 
-    // if datetime.Add(100,"D").String() != "2024-05-09T07:51:32.5132Z" {
-    //     t.Error(fmt.Sprintf("Expect: %s, but got %s","2024-01-30T07:51:32.5132Z",datetime.Add(100,"D").String()))
-    // }
+	// if datetime.Add(100,"D").String() != "2024-05-09T07:51:32.5132Z" {
+	//     t.Error(fmt.Sprintf("Expect: %s, but got %s","2024-01-30T07:51:32.5132Z",datetime.Add(100,"D").String()))
+	// }
 
-    if datetime.CurrentYearDays() != 366 {
-        t.Error("caculate has wrong")
+	if datetime.CurrentYearDays() != 366 {
+		t.Error("caculate has wrong")
+	}
+
+}
+
+func TestNumberConver(t *testing.T) {
+	result := utils.ToChineseNumber(-123, 10, false)
+	fmt.Printf("%s\n", result)
+
+	result3 := utils.ToChineseNumber(21, 10, false)
+	fmt.Printf("%s\n", result3)
+
+	result2 := utils.ToChineseNumber(20, 10, false)
+	fmt.Printf("%s\n", result2)
+}
+
+func TestOmit(t *testing.T) {
+	type People struct {
+		Name    string
+		Age     int
+		Address string
+	}
+	p := &People{
+		Name:    "william",
+        Age:     20,
+        Address: "BC",
+	}
+	result := utils.Omit(p, []string{"Name"})
+
+	if _, ok := result["Name"]; ok {
+		t.Error("Omit has wrong")
+	}
+    fmt.Printf("%#v\n", result)
+}
+
+func TestPick(t *testing.T) {
+    type People struct {
+        Name    string
+        Age     int
+        Address string
     }
-
+    p := &People{
+        Name:    "william",
+        Age:     20,
+        Address: "BC",
+    }
+    result := utils.Pick(p,[]string{"Name"})
+    if len(result) > 1 {
+        t.Error("Pick has wrong")
+    }
+    fmt.Printf("%#v\n", result)
 }

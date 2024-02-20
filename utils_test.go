@@ -375,3 +375,69 @@ func TestPick(t *testing.T) {
     }
     fmt.Printf("%#v\n", result)
 }
+
+func TestNumberToString(t *testing.T){
+    integer := 1000.00
+
+    result := utils.NumberToString(integer,10,nil)
+    if result != "1000"{
+        t.Error(fmt.Sprintf("NumberToString Expect: %s, but got %s","1000",result))
+    }
+    integer2 := -1000.00
+    result2 := utils.NumberToString(integer2,10,nil)
+    if result2 != "-1000"{
+        t.Error(fmt.Sprintf("NumberToString Expect: %s, but got %s","-1000",result2))
+    }
+
+}
+
+func TestStringToNumber(t *testing.T){
+    numberic := "30000"
+    result := utils.StringToNumber(numberic,10,nil)
+    if result != 30000 {
+        t.Error(fmt.Sprintf("TestStringToNumber Expect: %d, but got %d",30000,result))
+    }
+}
+
+func TestConectWord(t *testing.T){
+    text := "milk|potato|buffer"
+    result := utils.ConnectWord(text,false)
+
+    if result != "milk or potato and buffer" {
+        t.Error(fmt.Sprintf("TestConectWord Expect: %s, but got %s","milk or potato and buffer",result))
+    }
+
+}
+
+func TestFindVariabls(t *testing.T){
+    result := utils.FindVariableNames("{name} with {code}","{}")
+    if result[0] != "name" {
+        t.Error(fmt.Sprintf("TestConectWord Expect: %s, but got %s","name",result))
+    }
+    if result[1] != "code" {
+        t.Error(fmt.Sprintf("TestConectWord Expect: %s, but got %s","name",result))
+    }
+    result2 := utils.FindVariableNames("select * from {table} where id={id} and name={name}","{}")
+    fmt.Printf("%v\n",result2)
+}
+
+func TestReferenceString(t *testing.T){
+    refMap := map[string]string{
+        "table":"user",
+        "id":"id={id}",
+        "name":"name={name}",
+        "select":"select * from @table",
+        "update":"update @table",
+        "byId":"where @id",
+        "byName":"where @name",
+        "updateByName":"@update set @name @byName",
+    }
+    ref := utils.ReferenceString(refMap,'@')
+
+    if ref("byName") != "where name={name}"{
+        t.Error(fmt.Sprintf("TestReferenceString Expect: %s, but got %s","where name={name}",ref("byName")))
+    }
+    fmt.Printf("%s\n",ref("byName"))
+    fmt.Printf("%s\n",ref("updateByName"))
+
+}

@@ -46,13 +46,7 @@ func Template(source string, data map[string]any, placeholder string) string {
 			key = strings.Join([]string{"[", k, "]"}, "")
 		case "()":
 			key = strings.Join([]string{"(", k, ")"}, "")
-		case ":":
-			key = strings.Join([]string{tempSyntax, k}, "")
-		case "@":
-			key = strings.Join([]string{tempSyntax, k}, "")
-		case "#":
-			key = strings.Join([]string{tempSyntax, k}, "")
-		case "$":
+		case ":", "@", "#", "$":
 			key = strings.Join([]string{tempSyntax, k}, "")
 		case "?":
 			key = tempSyntax
@@ -70,6 +64,118 @@ func Template(source string, data map[string]any, placeholder string) string {
 		*sourceCopy = strings.Replace(*sourceCopy, key, valStr, 1)
 	}
 	return *sourceCopy
+}
+
+func InRange(val int, min int, max int) bool {
+    return val >= min && val <= max
+}
+
+func IsUpper(char rune) bool {
+    return InRange(int(char),int('A'),int('Z'))
+}
+
+func IsNumberic(char rune) bool {
+    return InRange(int(char),int('0'),int('9'))
+}
+func IsLower(char rune) bool {
+    return InRange(int(char),int('a'),int('z'))
+}
+
+func IsAlphabet(char rune) bool {
+    return IsLower(char) || IsUpper(char)
+}
+
+func IsAlphanum(char rune) bool {
+    return IsAlphabet(char) || IsNumberic(char)
+}
+
+func getValidRef(refname string,symbol rune) string {
+    word := []string{}
+    for _,char := range refname {
+        if char != symbol && int(char) != ' '{
+            if IsAlphanum(char) {
+                word = append(word, string(char))
+            }else if(int(char) > 0xff){
+                word = append(word, string(char))
+            }
+        }
+    }
+    return strings.Join(word,"")
+}
+
+func deepReplace(target map[string]string, symbol rune, text string) string {
+	clone := strings.Clone(text)
+	list := strings.Split(clone, " ")
+	for i := 0; i < len(list); i++ {
+		token := list[i]
+		if !strings.Contains(clone, string(symbol)) {
+			return clone
+		}
+		if strings.Contains(token, string(symbol)) {
+			refrence := strings.Split(token, string(symbol))
+			for _, refName := range refrence {
+				if refName == "" {
+					continue
+				}
+                validRef := getValidRef(refName,rune(symbol))
+				values := deepReplace(target, symbol, target[validRef])
+				clone = strings.Replace(clone, string(symbol)+refName, values, 1)
+			}
+		}
+	}
+	return clone
+}
+
+func ReferenceString(target map[string]string, symbol rune) func(string) string {
+	if symbol == 0 {
+		symbol = '@'
+	}
+	replace := func(text string) string {
+		return deepReplace(target, symbol, text)
+	}
+	getItem := func(key string) string {
+        if val,ok := target[key];ok {
+    		return replace(val)
+        }
+        return ""
+	}
+	return getItem
+}
+
+func FindVariableNames(text string, delimiter string) []string {
+	leftSyombol := ""
+	rightSyombol := ""
+	variables := []string{}
+	maxLength := len(text)
+	if maxLength&0 == 0 {
+		half := len(delimiter) / 2
+		leftSyombol = delimiter[:half]
+		rightSyombol = delimiter[half:]
+	} else {
+		leftSyombol = delimiter
+	}
+	idx := 0
+	for idx < maxLength {
+		nameCache := make([]string, 0)
+		if string(text[idx]) == leftSyombol {
+			n := idx + 1
+			for n < maxLength {
+				if rightSyombol != "" && string(text[n]) == rightSyombol {
+					break
+				} else if string(text[n]) == " " {
+					break
+				}
+				nameCache = append(nameCache, string(text[n]))
+				n++
+			}
+			variables = append(variables, strings.Join(nameCache, ""))
+			//
+			nameCache = make([]string, 0)
+			idx = n
+		}
+		idx++
+	}
+	return variables
 }
 
 type Cookie struct {
@@ -179,7 +285,7 @@ func NestedObject[T any](target T, path string, cb func(target reflect.Value, ke
 			mapValue := v.MapIndex(reflect.ValueOf(key))
 
 			if mapValue.Kind() == reflect.Interface ||
-                mapValue.Kind() == reflect.Pointer {
+				mapValue.Kind() == reflect.Pointer {
 				mapValue = mapValue.Elem()
 			}
 			if mapValue.IsValid() {

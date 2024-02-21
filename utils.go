@@ -67,40 +67,40 @@ func Template(source string, data map[string]any, placeholder string) string {
 }
 
 func InRange(val int, min int, max int) bool {
-    return val >= min && val <= max
+	return val >= min && val <= max
 }
 
 func IsUpper(char rune) bool {
-    return InRange(int(char),int('A'),int('Z'))
+	return InRange(int(char), int('A'), int('Z'))
 }
 
 func IsNumberic(char rune) bool {
-    return InRange(int(char),int('0'),int('9'))
+	return InRange(int(char), int('0'), int('9'))
 }
 func IsLower(char rune) bool {
-    return InRange(int(char),int('a'),int('z'))
+	return InRange(int(char), int('a'), int('z'))
 }
 
 func IsAlphabet(char rune) bool {
-    return IsLower(char) || IsUpper(char)
+	return IsLower(char) || IsUpper(char)
 }
 
 func IsAlphanum(char rune) bool {
-    return IsAlphabet(char) || IsNumberic(char)
+	return IsAlphabet(char) || IsNumberic(char)
 }
 
-func getValidRef(refname string,symbol rune) string {
-    word := []string{}
-    for _,char := range refname {
-        if char != symbol && int(char) != ' '{
-            if IsAlphanum(char) {
-                word = append(word, string(char))
-            }else if(int(char) > 0xff){
-                word = append(word, string(char))
-            }
-        }
-    }
-    return strings.Join(word,"")
+func getValidRef(refname string, symbol rune) string {
+	word := []string{}
+	for _, char := range refname {
+		if char != symbol && int(char) != ' ' {
+			if IsAlphanum(char) {
+				word = append(word, string(char))
+			} else if int(char) > 0xff {
+				word = append(word, string(char))
+			}
+		}
+	}
+	return strings.Join(word, "")
 }
 
 func deepReplace(target map[string]string, symbol rune, text string) string {
@@ -117,8 +117,12 @@ func deepReplace(target map[string]string, symbol rune, text string) string {
 				if refName == "" {
 					continue
 				}
-                validRef := getValidRef(refName,rune(symbol))
-				values := deepReplace(target, symbol, target[validRef])
+				validRef := getValidRef(refName, rune(symbol))
+				refString, ok := target[validRef]
+				if !ok {
+					refString = "/*" + refString + "*/"
+				}
+				values := deepReplace(target, symbol, refString)
 				clone = strings.Replace(clone, string(symbol)+refName, values, 1)
 			}
 		}
@@ -134,10 +138,10 @@ func ReferenceString(target map[string]string, symbol rune) func(string) string 
 		return deepReplace(target, symbol, text)
 	}
 	getItem := func(key string) string {
-        if val,ok := target[key];ok {
-    		return replace(val)
-        }
-        return ""
+		if val, ok := target[key]; ok {
+			return replace(val)
+		}
+		return ""
 	}
 	return getItem
 }

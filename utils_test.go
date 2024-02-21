@@ -431,6 +431,7 @@ func TestReferenceString(t *testing.T){
         "byId":"where @id",
         "byName":"where @name",
         "updateByName":"@update set @name @byName",
+        "error":"@mine",
     }
     ref := utils.ReferenceString(refMap,'@')
 
@@ -439,5 +440,6 @@ func TestReferenceString(t *testing.T){
     }
     fmt.Printf("%s\n",ref("byName"))
     fmt.Printf("%s\n",ref("updateByName"))
+    fmt.Printf("%s\n",ref("error"))
 
 }

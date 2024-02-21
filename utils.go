@@ -120,7 +120,7 @@ func deepReplace(target map[string]string, symbol rune, text string) string {
 				validRef := getValidRef(refName, rune(symbol))
 				refString, ok := target[validRef]
 				if !ok {
-					refString = "/*" + refString + "*/"
+					refString = "/*" + validRef + "*/"
 				}
 				values := deepReplace(target, symbol, refString)
 				clone = strings.Replace(clone, string(symbol)+refName, values, 1)

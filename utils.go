@@ -103,6 +103,13 @@ func getValidRef(refname string, symbol rune) string {
 	return strings.Join(word, "")
 }
 
+func toComment(val string, commentSymbol []string) string{
+    if len(commentSymbol) & 1 == 0 {
+        return strings.Join([]string{commentSymbol[0],val,commentSymbol[1]},"")
+    }
+    return commentSymbol[0] + val;
+}
+
 func deepReplace(target map[string]string, symbol rune, text string) string {
 	clone := strings.Clone(text)
 	list := strings.Split(clone, " ")
@@ -120,7 +127,7 @@ func deepReplace(target map[string]string, symbol rune, text string) string {
 				validRef := getValidRef(refName, rune(symbol))
 				refString, ok := target[validRef]
 				if !ok {
-					refString = "/*" + validRef + "*/"
+					refString = toComment(validRef,[]string{"/*","*/"})
 				}
 				values := deepReplace(target, symbol, refString)
 				clone = strings.Replace(clone, string(symbol)+refName, values, 1)

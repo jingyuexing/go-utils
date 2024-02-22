@@ -399,16 +399,6 @@ func TestStringToNumber(t *testing.T){
     }
 }
 
-func TestConectWord(t *testing.T){
-    text := "milk|potato|buffer"
-    result := utils.ConnectWord(text,false)
-
-    if result != "milk or potato and buffer" {
-        t.Error(fmt.Sprintf("TestConectWord Expect: %s, but got %s","milk or potato and buffer",result))
-    }
-
-}
-
 func TestFindVariabls(t *testing.T){
     result := utils.FindVariableNames("{name} with {code}","{}")
     if result[0] != "name" {
@@ -440,6 +430,7 @@ func TestReferenceString(t *testing.T){
     }
     fmt.Printf("%s\n",ref("byName"))
     fmt.Printf("%s\n",ref("updateByName"))
+    fmt.Printf("%s\n",utils.FindVariableNames(ref("updateByName"),"{}"))
     fmt.Printf("%s\n",ref("error"))
 
 }

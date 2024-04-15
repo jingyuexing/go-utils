@@ -337,6 +337,9 @@ func TestNumberConver(t *testing.T) {
 
 	result2 := utils.ToChineseNumber(20, 10, false)
 	fmt.Printf("%s\n", result2)
+
+    result4 := utils.ToChineseNumber(100,10,false)
+    fmt.Printf("%s\n",result4)
 }
 
 func TestOmit(t *testing.T) {
@@ -433,4 +436,18 @@ func TestReferenceString(t *testing.T){
     fmt.Printf("%s\n",utils.FindVariableNames(ref("updateByName"),"{}"))
     fmt.Printf("%s\n",ref("error"))
 
+}
+
+func TestBuffer(t *testing.T){
+    bf := utils.NewBuffer()
+    bf = bf.Load("320c3a83c202880e83fa0814320c3a83c202880e83fa10")
+    fmt.Printf("%#v\n",bf)
+
+    if bf[0] != 0x32 {
+        t.Error(fmt.Sprintf("TestBuffer expect: %d,but got %d",0x32,bf[0]))
+    }
+
+    if bf[22] != 0x10 {
+        t.Error(fmt.Sprintf("TestBuffer expect: %d,but got %d",0x10,bf[22]))
+    }
 }

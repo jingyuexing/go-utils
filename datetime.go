@@ -346,11 +346,12 @@ func (dt DateTime) Min(date ...DateTime) DateTime {
 	}
 	return min
 }
-
+// the current time is before the specified time
 func (dt DateTime) IsBefore(d DateTime) bool {
-	return d.Time() < dt.Time()
+	return d.Time() > dt.Time()
 }
 
+// the current time is after the specified time
 func (dt DateTime) IsAfter(d DateTime) bool {
 	return dt.Time() < d.Time()
 }

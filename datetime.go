@@ -106,7 +106,7 @@ func NewDateTime() DateTime {
 	d.Year = d.time.Year()
 	d.Month = int(d.time.Month())
 	d.Date = d.time.Day()
-    d.Day = d.time.Day()
+	d.Day = d.time.Day()
 	d.Hour = d.time.Hour()
 	d.Minute = d.time.Minute()
 	d.Second = d.time.Second()
@@ -232,7 +232,7 @@ func (dt DateTime) SetTime(sec int64, ns int64) DateTime {
 	d.Year = d.time.Year()
 	d.Month = int(d.time.Month())
 	d.Day = d.time.Day()
-    d.Date = d.Day
+	d.Date = d.Day
 	d.Hour = d.time.Hour()
 	d.Minute = d.time.Minute()
 	d.Second = d.time.Second()
@@ -362,66 +362,109 @@ func (dt DateTime) IsAfter(d DateTime) bool {
 	return dt.Time() < d.Time()
 }
 
-func (dt DateTime) Parse(date string) *DateTime {
-	current := 0
-	cache := make([]int, 0)
-	time := false
-	for current < len(date) {
-		if unicode.IsDigit(rune(date[current])) {
-			val := ""
-			for current < len(date) && (unicode.IsDigit(rune(date[current])) || rune(date[current]) == '.') {
-				val += string(date[current])
-				current++
-			}
-			date, _ := strconv.Atoi(val)
-			cache = append(cache, date)
-		}
-		if rune(date[current]) == ':' {
-			time = true
-		}
-		current++
-	}
-	if len(cache) == 0 {
-		return nil
-	}
-	datetime := NewDateTime()
-	timeParse = func(t []int) {
-		switch len(t) {
-		case 1:
-			// 年月日 时
-			datetime.SetYear(0, 0, 0, t[0], 0, 0, 0)
-		case 2:
-			// 年月日 时分
-			datetime.SetYear(0, 0, 0, t[0], t[1], 0, 0)
-		case 3:
-			//  年月日 时分秒
-			datetime.SetYear(0, 0, 0, t[0], t[1], t[2], 0)
-		case 4:
-			// 年月日 时分秒 毫秒
-			datetime.SetYear(0, 0, 0, t[0], t[1], t[2], t[3]*datetime.Nanosecond)
-		}
-	}
-	switch len(cache) {
-	case 1:
-		datetime.SetYear(cache[0], 0, 0, 0, 0, 0, 0)
-	case 2:
-		// 年月
-		datetime.SetYear(cache[0], cache[1], 0, 0, 0, 0, 0)
-	case 3:
-		// 年月日
-		datetime.SetYear(cache[0], cache[1], cache[2], 0, 0, 0, 0)
-	case 4:
-		// 年月日 时
-		datetime.SetYear(cache[0], cache[1], cache[2], cache[3], 0, 0, 0)
-	case 5:
-		// 年月日 时分
-		datetime.SetYear(cache[0], cache[1], cache[2], cache[3], cache[4], 0, 0)
-	case 6:
-		//  年月日 时分秒
-		datetime.SetYear(cache[0], cache[1], cache[2], cache[3], cache[4], cache[5], 0)
-	case 7:
-		// 年月日 时分秒 毫秒
-		datetime.SetYear(cache[0], cache[1], cache[2], cache[3], cache[4], cache[5], cache[5])
-	}
-	return &datetime
+func parseFormatTemplate(formatTemplate string) []string {
+    formatParts := make([]string, 0)
+    i := 0
+    for i < len(formatTemplate) {
+        switch {
+        case strings.HasPrefix(formatTemplate[i:], "YYYY"):
+            formatParts = append(formatParts, "YYYY")
+            i += 4
+        case strings.HasPrefix(formatTemplate[i:], "YY"):
+            formatParts = append(formatParts, "YY")
+            i += 2
+        case strings.HasPrefix(formatTemplate[i:], "MM"):
+            formatParts = append(formatParts, "MM")
+            i += 2
+        case strings.HasPrefix(formatTemplate[i:], "M"):
+            formatParts = append(formatParts, "M")
+            i++
+        case strings.HasPrefix(formatTemplate[i:], "dd") || strings.HasPrefix(formatTemplate[i:], "DD"):
+            formatParts = append(formatParts, "dd")
+            i += 2
+        case strings.HasPrefix(formatTemplate[i:], "d"):
+            formatParts = append(formatParts, "d")
+            i++
+        case strings.HasPrefix(formatTemplate[i:], "HH"):
+            formatParts = append(formatParts, "HH")
+            i += 2
+        case strings.HasPrefix(formatTemplate[i:], "H"):
+            formatParts = append(formatParts, "H")
+            i++
+        case strings.HasPrefix(formatTemplate[i:], "mm"):
+            formatParts = append(formatParts, "mm")
+            i += 2
+        case strings.HasPrefix(formatTemplate[i:], "m"):
+            formatParts = append(formatParts, "m")
+            i++
+        case strings.HasPrefix(formatTemplate[i:], "ss"):
+            formatParts = append(formatParts, "ss")
+            i += 2
+        case strings.HasPrefix(formatTemplate[i:], "s"):
+            formatParts = append(formatParts, "s")
+            i++
+        case strings.HasPrefix(formatTemplate[i:], "ms"):
+            formatParts = append(formatParts, "ms")
+            i += 2
+        case strings.HasPrefix(formatTemplate[i:], "W"):
+            formatParts = append(formatParts, "W")
+            i++
+        case strings.HasPrefix(formatTemplate[i:], "WW"):
+            formatParts = append(formatParts, "WW")
+            i += 2
+        default:
+            i++
+        }
+    }
+    return formatParts
+}
+func extractDateParts(date string, formatParts []string) map[string]string {
+    dateParts := make(map[string]string)
+    current := 0
+
+    for _, part := range formatParts {
+        val := ""
+        for current < len(date) && (unicode.IsDigit(rune(date[current])) || rune(date[current]) == '.') {
+            val += string(date[current])
+            current++
+        }
+        dateParts[part] = val
+        current++
+    }
+
+    return dateParts
+}
+
+func (dt DateTime) Parse(date string, formatTemplate string) *DateTime {
+    datetime := NewDateTime()
+    formatParts := parseFormatTemplate(formatTemplate)
+    dateParts := extractDateParts(date, formatParts)
+
+    if len(dateParts) == 0 {
+        return nil
+    }
+
+    for key, value := range dateParts {
+        val, _ := strconv.Atoi(value)
+        switch key {
+        case "YYYY":
+            datetime.Year = val
+        case "YY":
+            datetime.Year = val
+        case "MM", "M":
+            datetime.Month = val
+        case "dd", "DD", "d":
+            datetime.Day = val
+        case "HH", "H":
+            datetime.Hour = val
+        case "mm", "m":
+            datetime.Minute = val
+        case "ss", "s":
+            datetime.Second = val
+        case "ms":
+            datetime.Milliseconds = val
+        }
+    }
+
+    return &datetime
 }

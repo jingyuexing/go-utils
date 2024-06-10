@@ -326,6 +326,14 @@ func TestDateTime(t *testing.T) {
 		t.Error("caculate has wrong")
 	}
 
+    datetime2 := utils.NewDateTime()
+
+    datetime2 = *datetime2.Parse("2024/06/06/23:10:40","YYYY/MM/DD/HH:mm:ss")
+
+    if datetime2.Year != 2024 {
+        t.Error("paser has wrong")
+    }
+    fmt.Printf("解析后时间 %s",datetime2.String())
 }
 
 func TestNumberConver(t *testing.T) {
@@ -441,8 +449,6 @@ func TestReferenceString(t *testing.T){
 func TestBuffer(t *testing.T){
     bf := utils.NewBuffer()
     bf = bf.Load("320c3a83c202880e83fa0814320c3a83c202880e83fa10")
-    fmt.Printf("%#v\n",bf)
-
     if bf[0] != 0x32 {
         t.Error(fmt.Sprintf("TestBuffer expect: %d,but got %d",0x32,bf[0]))
     }

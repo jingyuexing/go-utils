@@ -1,8 +1,10 @@
 package utils
 
 import (
+	"strconv"
 	"strings"
 	"time"
+	"unicode"
 )
 
 type FormatTemplate string
@@ -80,6 +82,7 @@ type FormatCallback func(int) string
 type DateTime struct {
 	time         time.Time
 	Year         int
+	Date         int
 	Month        int
 	Day          int
 	Week         int
@@ -102,7 +105,8 @@ func NewDateTime() DateTime {
 	}
 	d.Year = d.time.Year()
 	d.Month = int(d.time.Month())
-	d.Day = d.time.Day()
+	d.Date = d.time.Day()
+    d.Day = d.time.Day()
 	d.Hour = d.time.Hour()
 	d.Minute = d.time.Minute()
 	d.Second = d.time.Second()
@@ -194,28 +198,28 @@ func (dt DateTime) Today() string {
 	return dt.Format(dt.DateFormat)
 }
 
-func (dt DateTime) Parse(format string) (DateTime, error) {
-	d := DateTime{}
-	parsedTime, err := time.Parse(time.RFC3339, format)
+// func (dt DateTime) Parse(format string) (DateTime, error) {
+// 	d := DateTime{}
+// 	parsedTime, err := time.Parse(time.RFC3339, format)
 
-	if err != nil {
-		return d, err
-	}
+// 	if err != nil {
+// 		return d, err
+// 	}
 
-	d.time = parsedTime
-	d.DateFormat = dt.DateFormat
-	d.TimeFormat = dt.TimeFormat
-	d.monthFormat = dt.monthFormat
-	d.weekFormat = dt.weekFormat
-	d.Year = d.time.Year()
-	d.Month = int(d.time.Month())
-	d.Day = d.time.Day()
-	d.Hour = d.time.Hour()
-	d.Minute = d.time.Minute()
-	d.Second = d.time.Second()
-	d.Nanosecond = d.time.Nanosecond()
-	return d, nil
-}
+// 	d.time = parsedTime
+// 	d.DateFormat = dt.DateFormat
+// 	d.TimeFormat = dt.TimeFormat
+// 	d.monthFormat = dt.monthFormat
+// 	d.weekFormat = dt.weekFormat
+// 	d.Year = d.time.Year()
+// 	d.Month = int(d.time.Month())
+// 	d.Day = d.time.Day()
+// 	d.Hour = d.time.Hour()
+// 	d.Minute = d.time.Minute()
+// 	d.Second = d.time.Second()
+// 	d.Nanosecond = d.time.Nanosecond()
+// 	return d, nil
+// }
 
 func (dt DateTime) SetTime(sec int64, ns int64) DateTime {
 	d := DateTime{
@@ -228,6 +232,7 @@ func (dt DateTime) SetTime(sec int64, ns int64) DateTime {
 	d.Year = d.time.Year()
 	d.Month = int(d.time.Month())
 	d.Day = d.time.Day()
+    d.Date = d.Day
 	d.Hour = d.time.Hour()
 	d.Minute = d.time.Minute()
 	d.Second = d.time.Second()
@@ -346,6 +351,7 @@ func (dt DateTime) Min(date ...DateTime) DateTime {
 	}
 	return min
 }
+
 // the current time is before the specified time
 func (dt DateTime) IsBefore(d DateTime) bool {
 	return d.Time() > dt.Time()
@@ -354,4 +360,68 @@ func (dt DateTime) IsBefore(d DateTime) bool {
 // the current time is after the specified time
 func (dt DateTime) IsAfter(d DateTime) bool {
 	return dt.Time() < d.Time()
+}
+
+func (dt DateTime) Parse(date string) *DateTime {
+	current := 0
+	cache := make([]int, 0)
+	time := false
+	for current < len(date) {
+		if unicode.IsDigit(rune(date[current])) {
+			val := ""
+			for current < len(date) && (unicode.IsDigit(rune(date[current])) || rune(date[current]) == '.') {
+				val += string(date[current])
+				current++
+			}
+			date, _ := strconv.Atoi(val)
+			cache = append(cache, date)
+		}
+		if rune(date[current]) == ':' {
+			time = true
+		}
+		current++
+	}
+	if len(cache) == 0 {
+		return nil
+	}
+	datetime := NewDateTime()
+	timeParse = func(t []int) {
+		switch len(t) {
+		case 1:
+			// 年月日 时
+			datetime.SetYear(0, 0, 0, t[0], 0, 0, 0)
+		case 2:
+			// 年月日 时分
+			datetime.SetYear(0, 0, 0, t[0], t[1], 0, 0)
+		case 3:
+			//  年月日 时分秒
+			datetime.SetYear(0, 0, 0, t[0], t[1], t[2], 0)
+		case 4:
+			// 年月日 时分秒 毫秒
+			datetime.SetYear(0, 0, 0, t[0], t[1], t[2], t[3]*datetime.Nanosecond)
+		}
+	}
+	switch len(cache) {
+	case 1:
+		datetime.SetYear(cache[0], 0, 0, 0, 0, 0, 0)
+	case 2:
+		// 年月
+		datetime.SetYear(cache[0], cache[1], 0, 0, 0, 0, 0)
+	case 3:
+		// 年月日
+		datetime.SetYear(cache[0], cache[1], cache[2], 0, 0, 0, 0)
+	case 4:
+		// 年月日 时
+		datetime.SetYear(cache[0], cache[1], cache[2], cache[3], 0, 0, 0)
+	case 5:
+		// 年月日 时分
+		datetime.SetYear(cache[0], cache[1], cache[2], cache[3], cache[4], 0, 0)
+	case 6:
+		//  年月日 时分秒
+		datetime.SetYear(cache[0], cache[1], cache[2], cache[3], cache[4], cache[5], 0)
+	case 7:
+		// 年月日 时分秒 毫秒
+		datetime.SetYear(cache[0], cache[1], cache[2], cache[3], cache[4], cache[5], cache[5])
+	}
+	return &datetime
 }

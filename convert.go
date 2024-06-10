@@ -47,18 +47,23 @@ func (c *ConversionFunctions) Weight(value float64, from, to string) (float64, e
 
 func (c *ConversionFunctions) Size(value float64, from, to string) float64 {
 	units := map[string]float64{
-		"k": 1000,
-		"w": 10000,
-		"m": 1000000,
-	}
-	_, fromValid := units[from]
-	_, toValid := units[to]
-	if fromValid && toValid {
+        "":  1,
+        "k": 1000,
+        "w": 10000,
+        "m": 1000000,
+        "b": 1000000000,
+    }
+    from = strings.ToLower(from)
+    to = strings.ToLower(to)
 
-		return (value * units[from]) / units[to]
-	} else {
-		return -1
-	}
+    fromFactor, fromValid := units[from]
+    toFactor, toValid := units[to]
+
+    if fromValid && toValid {
+        return (value * fromFactor) / toFactor
+    } else {
+        return -1
+    }
 }
 
 func (c *ConversionFunctions) Volume(value float64, from, to string) float64 {

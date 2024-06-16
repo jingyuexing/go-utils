@@ -1,6 +1,7 @@
 package utils_test
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"testing"
@@ -326,14 +327,14 @@ func TestDateTime(t *testing.T) {
 		t.Error("caculate has wrong")
 	}
 
-    datetime2 := utils.NewDateTime()
+	datetime2 := utils.NewDateTime()
 
-    datetime2 = *datetime2.Parse("2024/06/06/23:10:40","YYYY/MM/DD/HH:mm:ss")
+	datetime2 = *datetime2.Parse("2024/06/06/23:10:40", "YYYY/MM/DD/HH:mm:ss")
 
-    if datetime2.Year != 2024 {
-        t.Error("paser has wrong")
-    }
-    fmt.Printf("解析后时间 %s",datetime2.String())
+	if datetime2.Year != 2024 {
+		t.Error("paser has wrong")
+	}
+	fmt.Printf("解析后时间 %s", datetime2.String())
 }
 
 func TestNumberConver(t *testing.T) {
@@ -346,8 +347,8 @@ func TestNumberConver(t *testing.T) {
 	result2 := utils.ToChineseNumber(20, 10, false)
 	fmt.Printf("%s\n", result2)
 
-    result4 := utils.ToChineseNumber(100,10,false)
-    fmt.Printf("%s\n",result4)
+	result4 := utils.ToChineseNumber(100, 10, false)
+	fmt.Printf("%s\n", result4)
 }
 
 func TestOmit(t *testing.T) {
@@ -358,102 +359,195 @@ func TestOmit(t *testing.T) {
 	}
 	p := &People{
 		Name:    "william",
-        Age:     20,
-        Address: "BC",
+		Age:     20,
+		Address: "BC",
 	}
 	result := utils.Omit(p, []string{"Name"})
 
 	if _, ok := result["Name"]; ok {
 		t.Error("Omit has wrong")
 	}
-    fmt.Printf("%#v\n", result)
+	fmt.Printf("%#v\n", result)
 }
 
 func TestPick(t *testing.T) {
-    type People struct {
-        Name    string
-        Age     int
-        Address string
-    }
-    p := &People{
-        Name:    "william",
-        Age:     20,
-        Address: "BC",
-    }
-    result := utils.Pick(p,[]string{"Name"})
-    if len(result) > 1 {
-        t.Error("Pick has wrong")
-    }
-    fmt.Printf("%#v\n", result)
+	type People struct {
+		Name    string
+		Age     int
+		Address string
+	}
+	p := &People{
+		Name:    "william",
+		Age:     20,
+		Address: "BC",
+	}
+	result := utils.Pick(p, []string{"Name"})
+	if len(result) > 1 {
+		t.Error("Pick has wrong")
+	}
+	fmt.Printf("%#v\n", result)
 }
 
-func TestNumberToString(t *testing.T){
-    integer := 1000.00
+func TestNumberToString(t *testing.T) {
+	integer := 1000.00
 
-    result := utils.NumberToString(integer,10,nil)
-    if result != "1000"{
-        t.Error(fmt.Sprintf("NumberToString Expect: %s, but got %s","1000",result))
-    }
-    integer2 := -1000.00
-    result2 := utils.NumberToString(integer2,10,nil)
-    if result2 != "-1000"{
-        t.Error(fmt.Sprintf("NumberToString Expect: %s, but got %s","-1000",result2))
-    }
-
-}
-
-func TestStringToNumber(t *testing.T){
-    numberic := "30000"
-    result := utils.StringToNumber(numberic,10,nil)
-    if result != 30000 {
-        t.Error(fmt.Sprintf("TestStringToNumber Expect: %d, but got %d",30000,result))
-    }
-}
-
-func TestFindVariabls(t *testing.T){
-    result := utils.FindVariableNames("{name} with {code}","{}")
-    if result[0] != "name" {
-        t.Error(fmt.Sprintf("TestConectWord Expect: %s, but got %s","name",result))
-    }
-    if result[1] != "code" {
-        t.Error(fmt.Sprintf("TestConectWord Expect: %s, but got %s","name",result))
-    }
-    result2 := utils.FindVariableNames("select * from {table} where id={id} and name={name}","{}")
-    fmt.Printf("%v\n",result2)
-}
-
-func TestReferenceString(t *testing.T){
-    refMap := map[string]string{
-        "table":"user",
-        "id":"id={id}",
-        "name":"name={name}",
-        "select":"select * from @table",
-        "update":"update @table",
-        "byId":"where @id",
-        "byName":"where @name",
-        "updateByName":"@update set @name @byName",
-        "error":"@mine",
-    }
-    ref := utils.ReferenceString(refMap,'@')
-
-    if ref("byName") != "where name={name}"{
-        t.Error(fmt.Sprintf("TestReferenceString Expect: %s, but got %s","where name={name}",ref("byName")))
-    }
-    fmt.Printf("%s\n",ref("byName"))
-    fmt.Printf("%s\n",ref("updateByName"))
-    fmt.Printf("%s\n",utils.FindVariableNames(ref("updateByName"),"{}"))
-    fmt.Printf("%s\n",ref("error"))
+	result := utils.NumberToString(integer, 10, nil)
+	if result != "1000" {
+		t.Error(fmt.Sprintf("NumberToString Expect: %s, but got %s", "1000", result))
+	}
+	integer2 := -1000.00
+	result2 := utils.NumberToString(integer2, 10, nil)
+	if result2 != "-1000" {
+		t.Error(fmt.Sprintf("NumberToString Expect: %s, but got %s", "-1000", result2))
+	}
 
 }
 
-func TestBuffer(t *testing.T){
-    bf := utils.NewBuffer()
-    bf = bf.Load("320c3a83c202880e83fa0814320c3a83c202880e83fa10")
-    if bf[0] != 0x32 {
-        t.Error(fmt.Sprintf("TestBuffer expect: %d,but got %d",0x32,bf[0]))
-    }
+func TestStringToNumber(t *testing.T) {
+	numberic := "30000"
+	result := utils.StringToNumber(numberic, 10, nil)
+	if result != 30000 {
+		t.Error(fmt.Sprintf("TestStringToNumber Expect: %d, but got %d", 30000, result))
+	}
+}
 
-    if bf[22] != 0x10 {
-        t.Error(fmt.Sprintf("TestBuffer expect: %d,but got %d",0x10,bf[22]))
-    }
+func TestFindVariabls(t *testing.T) {
+	result := utils.FindVariableNames("{name} with {code}", "{}")
+	if result[0] != "name" {
+		t.Error(fmt.Sprintf("TestConectWord Expect: %s, but got %s", "name", result))
+	}
+	if result[1] != "code" {
+		t.Error(fmt.Sprintf("TestConectWord Expect: %s, but got %s", "name", result))
+	}
+	result2 := utils.FindVariableNames("select * from {table} where id={id} and name={name}", "{}")
+	fmt.Printf("%v\n", result2)
+}
+
+func TestReferenceString(t *testing.T) {
+	refMap := map[string]string{
+		"table":        "user",
+		"id":           "id={id}",
+		"name":         "name={name}",
+		"select":       "select * from @table",
+		"update":       "update @table",
+		"byId":         "where @id",
+		"byName":       "where @name",
+		"updateByName": "@update set @name @byName",
+		"error":        "@mine",
+	}
+	ref := utils.ReferenceString(refMap, '@')
+
+	if ref("byName") != "where name={name}" {
+		t.Error(fmt.Sprintf("TestReferenceString Expect: %s, but got %s", "where name={name}", ref("byName")))
+	}
+	fmt.Printf("%s\n", ref("byName"))
+	fmt.Printf("%s\n", ref("updateByName"))
+	fmt.Printf("%s\n", utils.FindVariableNames(ref("updateByName"), "{}"))
+	fmt.Printf("%s\n", ref("error"))
+
+}
+
+func TestBuffer(t *testing.T) {
+	bf := utils.NewBuffer()
+	bf = bf.Load("320c3a83c202880e83fa0814320c3a83c202880e83fa10")
+	if bf[0] != 0x32 {
+		t.Error(fmt.Sprintf("TestBuffer expect: %d,but got %d", 0x32, bf[0]))
+	}
+
+	if bf[22] != 0x10 {
+		t.Error(fmt.Sprintf("TestBuffer expect: %d,but got %d", 0x10, bf[22]))
+	}
+}
+
+func TestSet(t *testing.T) {
+	setA := utils.NewSet("A", "B", "C", "D", "E", "F", "G")
+	setB := utils.NewSet("F", "G", "H", "I", "J", "K", "L")
+
+	diff := setA.Intersection(setB)
+	if !diff.Has("F") {
+		t.Error(fmt.Sprintf("TestSe expect intersection Set has: %s element", "F"))
+	}
+}
+
+func TestOk(t *testing.T) {
+	result := utils.Ok("success")
+	if result.IsErr() {
+		t.Errorf("Expected result to be Ok, but got an error")
+	}
+	if result.Value() != "success" {
+		t.Errorf("Expected value 'success', but got %v", result.Value())
+	}
+}
+
+func TestErr(t *testing.T) {
+	err := errors.New("something went wrong")
+	result := utils.Err[string](err)
+	if result.IsOk() {
+		t.Errorf("Expected result to be Err, but got Ok")
+	}
+	if result.Err() != err {
+		t.Errorf("Expected error %v, but got %v", err, result.Err().Error())
+	}
+}
+
+func TestUnwrap(t *testing.T) {
+	result := utils.Ok("success")
+	value := result.Unwrap()
+	if value != "success" {
+		t.Errorf("Expected value 'success', but got %v", value)
+	}
+
+	errorResult := utils.Err[string](errors.New("something went wrong"))
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("Expected panic, but did not get one")
+		}
+	}()
+	errorResult.Unwrap()
+}
+
+func TestUnwrapOr(t *testing.T) {
+	result := utils.Ok("success")
+	value := result.UnwrapOr("default")
+	if value != "success" {
+		t.Errorf("Expected value 'success', but got %v", value)
+	}
+
+	errorResult := utils.Err[string](errors.New("something went wrong"))
+	value = errorResult.UnwrapOr("default")
+	if value != "default" {
+		t.Errorf("Expected value 'default', but got %v", value)
+	}
+}
+
+func TestTryCatch(t *testing.T) {
+	successResult := utils.Ok("success")
+	successResult.TryCatch(func(value string) error {
+		if value != "success" {
+			t.Errorf("Expected value 'success', but got %v", value)
+		}
+		return nil
+	})
+
+	errorResult := utils.Ok("success")
+	errorResult = errorResult.TryCatch(func(value string) error {
+		panic("oops, something went wrong")
+	})
+
+	if errorResult.IsOk() {
+		t.Errorf("Expected result to be Err, but got Ok")
+	}
+	if errorResult.Err().Error() != "oops, something went wrong" {
+		t.Errorf("Expected panic error 'oops, something went wrong', but got %v", errorResult.Err())
+	}
+}
+
+func TestNewResult(t *testing.T) {
+	result := utils.NewResult("success")
+	if result.IsErr() {
+		t.Errorf("Expected result to be Ok, but got an error")
+	}
+	if result.Value() != "success" {
+		t.Errorf("Expected value 'success', but got %v", result.Value())
+	}
 }

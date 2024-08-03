@@ -6,8 +6,8 @@ import (
 )
 
 type Result[T any] struct {
-	value T     // 成功值
-	err   error // 错误信息
+	value T     // the value
+	err   error // error information
 }
 
 func Ok[T any](value T) Result[T] {
@@ -82,19 +82,3 @@ func (r *Result[T]) TryCatch(callback func(T) error) Result[T] {
 func NewResult[T any](value T) Result[T] {
 	return Result[T]{value: value}
 }
-
-// This function takes a Result[T] and a mapping function f of type func(T) U
-// and returns a new Result[U] containing the transformed value
-// func Map[T any, U any](r Result[T], f func(T) U) Result[U] {
-//   if !r.ok {
-//     return Err[U](r.err)
-//   }
-//   return Ok[U](f(r.val))
-// }
-
-// func (r Result[T]) AndThen(f func(T) Result[U]) Result[U] {
-//     if !r.ok {
-//         return Err[U](r.err)
-//     }
-//     return f(r.val)
-// }

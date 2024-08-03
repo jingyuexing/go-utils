@@ -384,62 +384,68 @@ func (a *BigNumber) Sub(b *BigNumber) *BigNumber {
 
 // Multiply multiplies two BigNumber instances and returns a new BigNumber instance.
 func (a *BigNumber) Multiply(b *BigNumber) *BigNumber {
-	num1, num2 := a.value, b.value
-	if strings.Contains(num1, a.format.decimalSeparator) || strings.Contains(num2, a.format.decimalSeparator) {
-		num1, num2 = normalizeDecimal(num1, num2, a.format.decimalSeparator)
-	}
+    num1, num2 := a.value, b.value
+    if strings.Contains(num1, a.format.decimalSeparator) || strings.Contains(num2, a.format.decimalSeparator) {
+        num1, num2 = normalizeDecimal(num1, num2, a.format.decimalSeparator)
+    }
 
-	intPart1, decPart1 := splitDecimal(num1, a.format.decimalSeparator)
-	intPart2, decPart2 := splitDecimal(num2, a.format.decimalSeparator)
+    intPart1, decPart1 := splitDecimal(num1, a.format.decimalSeparator)
+    intPart2, decPart2 := splitDecimal(num2, a.format.decimalSeparator)
 
-	intPart1 += decPart1
-	intPart2 += decPart2
+    intPart1 += decPart1
+    intPart2 += decPart2
 
-	m := len(decPart1) + len(decPart2)
-	len1 := len(intPart1)
-	len2 := len(intPart2)
+    m := len(decPart1) + len(decPart2)
+    len1 := len(intPart1)
+    len2 := len(intPart2)
 
-	result := make([]int, len1+len2)
-	for i := len1 - 1; i >= 0; i-- {
-		for j := len2 - 1; j >= 0; j-- {
-			mul := a.toInteger(string(intPart1[i])) * a.toInteger(string(intPart2[j]))
-			p1 := i + j
-			p2 := i + j + 1
-			sum := mul + result[p2]
-			result[p1] += sum / a.format.base
-			result[p2] = sum % a.format.base
-		}
-	}
+    result := make([]int, len1+len2)
+    for i := len1 - 1; i >= 0; i-- {
+        for j := len2 - 1; j >= 0; j-- {
+            mul := a.toInteger(string(intPart1[i])) * a.toInteger(string(intPart2[j]))
+            p1 := i + j
+            p2 := i + j + 1
+            sum := mul + result[p2]
+            result[p1] += sum / a.format.base
+            result[p2] = sum % a.format.base
+        }
+    }
 
-	resultStr := ""
-	for _, digit := range result {
-		resultStr += a.toNumber(digit)
-	}
+    resultStr := ""
+    for _, digit := range result {
+        resultStr += a.toNumber(digit)
+    }
 
-	if m > 0 {
-		resultStr = insertDecimalPoint(resultStr, m, a.format.decimalSeparator)
-	}
-	resultStr = strings.TrimLeft(resultStr, "0")
-    resultStr = insertDecimalPoint(resultStr, a.format.maxDecimal, a.format.decimalSeparator)
+    if m > 0 {
+        resultStr = insertDecimalPoint(resultStr, m, a.format.decimalSeparator)
+    }
 
+    // 修正前导零和小数点处理逻辑
+    resultStr = strings.TrimLeft(resultStr, "0")
+    if strings.HasPrefix(resultStr, a.format.decimalSeparator) {
+        resultStr = "0" + resultStr
+    }
+    if strings.Contains(resultStr, a.format.decimalSeparator) {
+        parts := strings.Split(resultStr, a.format.decimalSeparator)
+        if len(parts[1]) < a.format.maxDecimal {
+            parts[1] = PadEndString(parts[1], a.format.maxDecimal, "0")
+        }
+        resultStr = strings.Join(parts, a.format.decimalSeparator)
+    }
 
-    integerPart,decimalPart := splitDecimal(resultStr,a.format.decimalSeparator)
-
-    resultStr = strings.Join([]string{integerPart,PadEndString(decimalPart,a.format.maxDecimal,"0")},a.format.decimalSeparator)
-
-    if(a.format.maxDecimal <= 0){
+    if a.format.maxDecimal <= 0 {
         resultStr = strings.TrimRight(resultStr, "0")
     }
     if strings.HasSuffix(resultStr, a.format.decimalSeparator) {
         resultStr = strings.TrimSuffix(resultStr, a.format.decimalSeparator)
     }
-	if resultStr == "" {
-		resultStr = "0"
-	}
+    if resultStr == "" {
+        resultStr = "0"
+    }
 
-	resultBigNumber := NewBigNumber(resultStr)
-	resultBigNumber.sign = a.sign * b.sign
-	return resultBigNumber
+    resultBigNumber := NewBigNumber(resultStr)
+    resultBigNumber.sign = a.sign * b.sign
+    return resultBigNumber
 }
 
 // Divide divides two BigNumber instances and returns the quotient and remainder.

@@ -161,7 +161,7 @@ func TestTimes(t *testing.T) {
 }
 
 func TestReduce(t *testing.T) {
-	sum := utils.Reduce([]int{1, 2, 3, 5, 6}, func(accumulator, currentValue int) int {
+	sum := utils.Reduce([]int{1, 2, 3, 5, 6}, func(accumulator, currentValue int,index int) int {
 		return accumulator + currentValue
 	}, 0)
 	if sum != 17 {
@@ -352,7 +352,12 @@ func TestNumberConver(t *testing.T) {
 }
 
 func TestOmit(t *testing.T) {
+    type Addr struct {
+        Position string
+        Last bool
+    }
 	type People struct {
+        Addr
 		Name    string
 		Age     int
 		Address string
@@ -550,4 +555,78 @@ func TestNewResult(t *testing.T) {
 	if result.Value() != "success" {
 		t.Errorf("Expected value 'success', but got %v", result.Value())
 	}
+}
+
+func TestBigNumber(t *testing.T){
+    num1 := utils.NewBigNumber("12")
+    num2 := utils.NewBigNumber("12")
+
+    sum := num1.Plus(num2)
+    if sum.String() != "24" {
+        t.Error(fmt.Sprintf("%s + %s Expected %s",num1.String(), num2.String(), sum.String()))
+    }
+
+    diff := num1.Minus(num2)
+    fmt.Printf("%s - %s = %s\n", num1.String(), num2.String(), diff.String())
+
+    num3 := utils.NewBigNumber("89.0000001")
+    num4 := utils.NewBigNumber("0.001")
+    sum5 := num3.Plus(num4)
+    if sum5.String() != "89.0010001" {
+        t.Error(fmt.Sprintf("%s + %s Expected %s",num3.String(), num4.String(), sum5.String()))
+    }
+
+    num6 := utils.NewBigNumber("0.02")
+    num7 := utils.NewBigNumber("0.01")
+    sum6 := num6.Plus(num7)
+    if sum6.String() != "0.03" {
+        t.Error(fmt.Sprintf(" %s + %s expected %s,but got %s",num6.String(),num7.String(),"0.03",sum6.String()))
+    }
+
+    if num6.Multiply(num7).String() != "0.000200" {
+        t.Error(fmt.Sprintf(" %s * %s expected %s,but got %s",num6.String(),num7.String(),"0.0002",num6.Multiply(num7).String()))
+    }
+
+    num8 := utils.NewBigNumber("8")
+    num9 := utils.NewBigNumber("9")
+    sum7 := num8.Minus(num9)
+    if sum7.String() != "-1" {
+        t.Error(fmt.Sprintf(" %s - %s expected %s,but got %s",num8.String(),num9.String(),"-1",sum7.String()))
+    }
+    num10 := utils.NewBigNumber("1")
+    num11 := utils.NewBigNumber("-1")
+    if !num10.IsGreaterThan(num11) {
+        t.Error("1 should be great than -1")
+    }
+
+    num12 := utils.NewBigNumber("-1")
+    num13 := utils.NewBigNumber("-1")
+    if num12.Plus(num13).String() != "-2" {
+        t.Error("-1 + -1 should be -2")
+    }
+
+    if num12.Minus(num13).String() != "0" {
+        t.Error("-1 - -1 should be 0")
+    }
+
+    num14 := utils.NewBigNumber("1")
+    num15 := utils.NewBigNumber("2")
+    result := num14.Divide(num15)
+    if result.String() != "0.500000" {
+        t.Error(fmt.Sprintf(" 1 / 2 should be 0.5, but got %s",result.String()))
+    }
+    nums16 := utils.NewBigNumber("-12")
+    if nums16.AbsoluteValue().String() != "12" {
+        t.Error(fmt.Sprintf("the -12 absolute value should be 12, but got %s",nums16.AbsoluteValue().String()))
+    }
+
+    num17 := utils.NewBigNumber("12")
+    s := num17.Sum("12","33","68","92","76","82","64")
+    fmt.Print(s.String())
+}
+
+
+func TestRevese(t *testing.T){
+    d := utils.Reverse([]string{"A","B","C","D","E","F"})
+    fmt.Printf("%v",d)
 }

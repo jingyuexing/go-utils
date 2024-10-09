@@ -217,6 +217,10 @@ func (dt DateTime) SetTime(sec int64, ns int64) DateTime {
 	return d
 }
 
+func (dt DateTime) RawTime() *time.Time {
+    return &dt.time
+}
+
 func (dt DateTime) LocaleCallBack(t string, call func(t string) string) string {
 	return dt.Format(call(t))
 }
@@ -258,6 +262,16 @@ func (d DateTime) SubtractDays(days int) DateTime {
 
 func (d DateTime) WeekDay() int {
 	return int(d.time.Weekday())
+}
+
+func (d DateTime) CountDays() int {
+    start := time.Date(d.Year, time.January, 1, 0, 0, 0, 0, time.UTC)
+    end := time.Date(d.Year+1, time.January, 1, 0, 0, 0, 0, time.UTC)
+    return int(end.Sub(start).Hours() / 24)
+}
+
+func (d DateTime) Progress() float32 {
+    return float32(d.time.YearDay()) / float32(d.CountDays())
 }
 
 func (d DateTime) WeekOfYear() int {
@@ -414,6 +428,9 @@ func extractDateParts(date string, formatParts []string) map[string]string {
 
 func (dt DateTime) Parse(date string, formatTemplate string) *DateTime {
 	datetime := NewDateTime()
+    if formatTemplate == "" {
+        formatTemplate = dt.DateFormat + "T" + dt.TimeFormat + "Z"
+    }
 	formatParts := parseFormatTemplate(formatTemplate)
 	dateParts := extractDateParts(date, formatParts)
 

@@ -98,20 +98,24 @@ type DateTime struct {
 }
 
 func NewDateTime() DateTime {
-	d := DateTime{
-		time:       time.Now(),
-		DateFormat: "YYYY-MM-DD",
-		TimeFormat: "HH:mm:ss.ms",
-	}
-	d.Year = d.time.Year()
-	d.Month = int(d.time.Month())
-	d.Date = d.time.Day()
-	d.Day = d.time.Day()
-	d.Hour = d.time.Hour()
-	d.Minute = d.time.Minute()
-	d.Second = d.time.Second()
-	d.Nanosecond = d.time.Nanosecond()
-	return d
+	return From(time.Now())
+}
+
+func From(time time.Time) DateTime {
+    d := DateTime{
+        time:       time,
+        DateFormat: "YYYY-MM-DD",
+        TimeFormat: "HH:mm:ss.ms",
+    }
+    d.Year = d.time.Year()
+    d.Month = int(d.time.Month())
+    d.Date = d.time.Day()
+    d.Day = d.time.Day()
+    d.Hour = d.time.Hour()
+    d.Minute = d.time.Minute()
+    d.Second = d.time.Second()
+    d.Nanosecond = d.time.Nanosecond()
+    return d
 }
 
 func (dt DateTime) SetYear(year int, month int, day int, hour int, minute int, second int, nanosecond int) DateTime {

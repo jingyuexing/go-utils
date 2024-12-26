@@ -1,8 +1,5 @@
 package utils
 
-func IsIntegerNotMax(val int) bool {
-	return val < 0x7FFFFFFFFFFFFFFF
-}
 
 func IsNonNegative(val int) bool {
 	return val >= 0

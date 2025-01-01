@@ -613,11 +613,11 @@ func TestBigNumber(t *testing.T){
     num15 := utils.NewBigNumber("2")
     result := num14.Divide(num15)
     if result.String() != "0.500000" {
-        t.Error(fmt.Sprintf(" 1 / 2 should be 0.5, but got %s",result.String()))
+        t.Error(fmt.Sprintf(" 1 / 2 should be 0.5, but got %s\n",result.String()))
     }
     nums16 := utils.NewBigNumber("-12")
     if nums16.AbsoluteValue().String() != "12" {
-        t.Error(fmt.Sprintf("the -12 absolute value should be 12, but got %s",nums16.AbsoluteValue().String()))
+        t.Error(fmt.Sprintf("the -12 absolute value should be 12, but got %s\n",nums16.AbsoluteValue().String()))
     }
 
     num17 := utils.NewBigNumber("12")
@@ -628,5 +628,17 @@ func TestBigNumber(t *testing.T){
 
 func TestRevese(t *testing.T){
     d := utils.Reverse([]string{"A","B","C","D","E","F"})
-    fmt.Printf("%v",d)
+    fmt.Printf("%v\n",d)
+}
+
+func TestDatatimeOption(t *testing.T){
+    dt := utils.NewDateTime()
+    dt = dt.Set(
+        utils.WithDateTimeYear(2018),
+    )
+    if dt.Year != 2018 {
+        t.Error(fmt.Sprintf(" expected 2018, but got %d",dt.Year))
+    }
+    fmt.Printf("datetime is %s\n",dt.String())
+
 }

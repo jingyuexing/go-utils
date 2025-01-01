@@ -4,7 +4,7 @@ type Set[T comparable] map[T]bool
 
 func (s Set[T]) Values() []T {
 	values := make([]T, 0)
-	for k, _ := range s {
+	for k := range s {
 		values = append(values, k)
 	}
 	return values
@@ -18,6 +18,17 @@ func (s Set[T]) Has(value T) bool {
 func (s Set[T]) Add(value T) bool {
     s[value] = true
     return s[value]
+}
+
+func (s Set[T]) Adds(values ...T) bool {
+    allAdded := true
+
+    for _, value := range values {
+        if !s.Add(value) {
+            allAdded = allAdded && false
+        }
+    }
+    return allAdded
 }
 
 func NewSet[T comparable](value ...T) Set[T] {

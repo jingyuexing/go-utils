@@ -118,24 +118,82 @@ func From(time time.Time) DateTime {
     return d
 }
 
-func (dt DateTime) SetYear(year int, month int, day int, hour int, minute int, second int, nanosecond int) DateTime {
-	d := DateTime{
-		time:        time.Date(year, time.Month(month), day, hour, minute, second, nanosecond, time.UTC),
-		DateFormat:  dt.DateFormat,
-		TimeFormat:  dt.TimeFormat,
-		monthFormat: dt.monthFormat,
-		weekFormat:  dt.weekFormat,
-	}
-	d.Year = d.time.Year()
-	d.Month = int(d.time.Month())
-	d.Day = d.time.Day()
-	d.Hour = d.time.Hour()
-	d.Minute = d.time.Minute()
-	d.Second = d.time.Second()
-	d.Nanosecond = d.time.Nanosecond()
-	return d
+// 通用的 SetDateTime 函数
+func (dt DateTime) SetDateTime(year, month, day, hour, minute, second, nanosecond int) DateTime {
+    newTime := time.Date(year, time.Month(month), day, hour, minute, second, nanosecond, time.UTC)
+    return DateTime{
+        time:       newTime,
+        DateFormat: dt.DateFormat,
+        TimeFormat: dt.TimeFormat,
+        Year:       newTime.Year(),
+        Month:      int(newTime.Month()),
+        Day:        newTime.Day(),
+        Hour:       newTime.Hour(),
+        Minute:     newTime.Minute(),
+        Second:     newTime.Second(),
+        Nanosecond: newTime.Nanosecond(),
+    }
 }
 
+func (dt DateTime) SetYear(year int, month int, day int, hour int, minute int, second int, nanosecond int) DateTime {
+	return dt.SetDateTime(year, month, day, hour, minute, second, nanosecond)
+}
+
+func (dt DateTime) Set(opts ...DataOption[DateTime]) DateTime {
+    for _, opt := range opts {
+        // 应用每个选项函数，修改 dt
+        opt(&dt)
+    }
+    return dt
+}
+
+func SetDateTimeOption(setter func(dt DateTime, year, month, day, hour, minute, second, nanosecond int) DateTime) DataOption[DateTime] {
+    return func(dt *DateTime) {
+        *dt = setter(*dt, dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second, dt.Nanosecond)
+    }
+}
+
+func WithDateTimeYear(year int) DataOption[DateTime] {
+    return SetDateTimeOption(func(dt DateTime, _, month, day, hour, minute, second, nanosecond int) DateTime {
+        return dt.SetDateTime(year, month, day, hour, minute, second, nanosecond)
+    })
+}
+
+func WithDateTimeMonth(month int) DataOption[DateTime] {
+    return SetDateTimeOption(func(dt DateTime, year, _, day, hour, minute, second, nanosecond int) DateTime {
+        return dt.SetDateTime(year, month, day, hour, minute, second, nanosecond)
+    })
+}
+
+func WithDateTimeDay(day int) DataOption[DateTime] {
+    return SetDateTimeOption(func(dt DateTime, year, month, _, hour, minute, second, nanosecond int) DateTime {
+        return dt.SetDateTime(year, month, day, hour, minute, second, nanosecond)
+    })
+}
+
+func WithDateTimeHour(hour int) DataOption[DateTime] {
+    return SetDateTimeOption(func(dt DateTime, year, month, day, _, minute, second, nanosecond int) DateTime {
+        return dt.SetDateTime(year, month, day, hour, minute, second, nanosecond)
+    })
+}
+
+func WithDateTimeMinute(minute int) DataOption[DateTime] {
+    return SetDateTimeOption(func(dt DateTime, year, month, day, hour, _, second, nanosecond int) DateTime {
+        return dt.SetDateTime(year, month, day, hour, minute, second, nanosecond)
+    })
+}
+
+func WithDateTimeSecond(second int) DataOption[DateTime] {
+    return SetDateTimeOption(func(dt DateTime, year, month, day, hour, minute, _, nanosecond int) DateTime {
+        return dt.SetDateTime(year, month, day, hour, minute, second, nanosecond)
+    })
+}
+
+func WithDateTimeNanosecond(nanosecond int) DataOption[DateTime] {
+    return SetDateTimeOption(func(dt DateTime, year, month, day, hour, minute, second, _ int) DateTime {
+        return dt.SetDateTime(year, month, day, hour, minute, second, nanosecond)
+    })
+}
 func (dt DateTime) SetMonth(month int, day int, hour int, minute int, second int, nanosecond int) DateTime {
 	return dt.SetYear(dt.Year, month, day, hour, minute, second, nanosecond)
 }

@@ -12,6 +12,17 @@ import (
 	"time"
 )
 
+type DataOption[T any] func(*T)
+
+func IsZeroValue(val any) bool {
+    reflectValue := reflect.ValueOf(val)
+    if reflectValue.Kind() == reflect.Pointer {
+        reflectValue = reflectValue.Elem()
+    }
+    return reflectValue.IsZero()
+}
+
+
 func ToString(val any) string {
 	valstr := ""
 	switch v := val.(type) {
